@@ -20,10 +20,12 @@ mod test {
 
     #[test]
     fn eval_returns_not_found() {
+        let command = "test";
+
         let expression = Expression {
-            input: "test".to_string(),
+            input: command.to_string(),
         };
 
-        assert_eq!("test: command not found", eval(expression));
+        assert_eq!(format!("{command}: command not found"), eval(expression));
     }
 }
