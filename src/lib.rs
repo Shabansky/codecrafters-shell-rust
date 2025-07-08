@@ -25,7 +25,6 @@ pub fn read(input: String) -> Expression {
 }
 
 pub fn eval(expression: Expression) -> String {
-    println!("{}", expression.input);
     //TODO: Below needs to be split and create BuiltinExit properly
     if expression.input == "exit 0" {
         BuiltinExit::from(&expression).run();
