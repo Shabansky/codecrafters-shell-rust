@@ -16,6 +16,20 @@ impl BuiltinExit {
 #[derive(Debug)]
 pub struct Expression {
     input: String,
+    command: String,
+    arguments: Vec<String>,
+}
+
+impl Expression {
+    fn from(input: String) -> Self {
+        let mut arguments: Vec<String> = input.split_whitespace().map(|s| s.to_string()).collect();
+        let command = arguments.pop().expect("input string must not be empty");
+        Self {
+            input,
+            command,
+            arguments,
+        }
+    }
 }
 
 #[derive(PartialEq, Debug)]
@@ -29,11 +43,7 @@ pub fn read(input: String) -> Result<Expression, ReadError> {
         return Err(ReadError::NoCommand);
     }
 
-    //TODO: Expression::new()
-    //TODO: .to_string() is overkill. Consider input to be of type &str instead
-    Ok(Expression {
-        input: input.to_string(),
-    })
+    Ok(Expression::from(input.to_string()))
 }
 
 pub fn eval(expression: Expression) -> String {
@@ -54,11 +64,8 @@ mod test {
 
     #[test]
     fn eval_returns_not_found() {
-        let command = "test";
-
-        let expression = Expression {
-            input: command.to_string(),
-        };
+        let command = String::from("test");
+        let expression = Expression::from(command.clone());
 
         assert_eq!(format!("{command}: command not found"), eval(expression));
     }
