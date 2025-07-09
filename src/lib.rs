@@ -1,4 +1,4 @@
-use std::process;
+use std::{io::Read, process};
 struct BuiltinExit {
     code: i32,
 }
@@ -13,15 +13,27 @@ impl BuiltinExit {
     }
 }
 
+#[derive(Debug)]
 pub struct Expression {
     input: String,
 }
 
-pub fn read(input: String) -> Expression {
-    //TODO: .to_string() is overkill. Consider input to be of type &str instead
-    Expression {
-        input: input.trim().to_string(),
+#[derive(PartialEq, Debug)]
+pub enum ReadError {
+    NoCommand,
+}
+
+pub fn read(input: String) -> Result<Expression, ReadError> {
+    let input = input.trim();
+    if input.len() == 0 {
+        return Err(ReadError::NoCommand);
     }
+
+    //TODO: Expression::new()
+    //TODO: .to_string() is overkill. Consider input to be of type &str instead
+    Ok(Expression {
+        input: input.to_string(),
+    })
 }
 
 pub fn eval(expression: Expression) -> String {
@@ -49,5 +61,12 @@ mod test {
         };
 
         assert_eq!(format!("{command}: command not found"), eval(expression));
+    }
+
+    #[test]
+    fn empty_command_returns_read_error() {
+        let command = String::from("       ");
+        let expression = read(command);
+        assert_eq!(ReadError::NoCommand, expression.unwrap_err());
     }
 }

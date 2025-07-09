@@ -10,7 +10,15 @@ fn main() {
         io::stdin().read_line(&mut input).unwrap();
 
         let expression = read(input);
-        let output = eval(expression);
-        print(output);
+        match expression {
+            //TODO: Too general. Assumes all errors are treated the same way.
+            Err(_) => {
+                continue;
+            }
+            Ok(expression) => {
+                let output = eval(expression);
+                print(output);
+            }
+        }
     }
 }
