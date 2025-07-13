@@ -1,6 +1,8 @@
-use std::{io::Read, process};
+use std::process;
+
+type ExitCode = i32;
 struct BuiltinExit {
-    code: i32,
+    code: ExitCode,
 }
 
 impl BuiltinExit {
@@ -8,7 +10,7 @@ impl BuiltinExit {
         let code = expression
             .arguments
             .first()
-            .and_then(|arg| arg.parse::<i32>().ok())
+            .and_then(|arg| arg.parse::<ExitCode>().ok())
             .unwrap_or(0);
 
         Self { code }
