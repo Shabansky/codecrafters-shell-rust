@@ -4,8 +4,14 @@ struct BuiltinExit {
 }
 
 impl BuiltinExit {
-    fn from(expression: &Expression) -> Self {
-        Self { code: 0 }
+    fn from(expression: Expression) -> Self {
+        let code = expression
+            .arguments
+            .first()
+            .and_then(|arg| arg.parse::<i32>().ok())
+            .unwrap_or(0);
+
+        Self { code }
     }
 
     fn run(&self) {
@@ -49,13 +55,12 @@ pub fn read(input: String) -> Result<Expression, ReadError> {
 }
 
 pub fn eval(expression: Expression) -> Option<String> {
-    //TODO: Below needs to be split and create BuiltinExit properly
-
-    if expression.input == "exit 0" {
-        BuiltinExit::from(&expression).run();
+    let command = expression.command.clone();
+    if expression.command == "exit" {
+        BuiltinExit::from(expression).run();
         return None;
     }
-    Some(format!("{}: command not found", expression.command))
+    Some(format!("{}: command not found", command))
 }
 
 pub fn print(output: String) {
