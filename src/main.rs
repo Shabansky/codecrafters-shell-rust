@@ -16,8 +16,9 @@ fn main() {
                 continue;
             }
             Ok(expression) => {
-                let output = eval(expression);
-                print(output);
+                if let Some(output) = eval(expression) {
+                    print(output);
+                }
             }
         }
     }

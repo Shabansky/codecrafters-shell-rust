@@ -22,8 +22,10 @@ pub struct Expression {
 
 impl Expression {
     fn from(input: String) -> Self {
-        let mut arguments: Vec<String> = input.split_whitespace().map(|s| s.to_string()).collect();
-        let command = arguments.pop().expect("input string must not be empty");
+        let mut parts = input.split_whitespace();
+        let command = parts.next().unwrap_or("").to_string();
+        let arguments: Vec<String> = parts.map(|s| s.to_string()).collect();
+
         Self {
             input,
             command,
@@ -46,12 +48,14 @@ pub fn read(input: String) -> Result<Expression, ReadError> {
     Ok(Expression::from(input.to_string()))
 }
 
-pub fn eval(expression: Expression) -> String {
+pub fn eval(expression: Expression) -> Option<String> {
     //TODO: Below needs to be split and create BuiltinExit properly
+
     if expression.input == "exit 0" {
         BuiltinExit::from(&expression).run();
+        return None;
     }
-    format!("{}: command not found", expression.input.trim())
+    Some(format!("{}: command not found", expression.command))
 }
 
 pub fn print(output: String) {
@@ -67,7 +71,10 @@ mod test {
         let command = String::from("test");
         let expression = Expression::from(command.clone());
 
-        assert_eq!(format!("{command}: command not found"), eval(expression));
+        assert_eq!(
+            format!("{command}: command not found"),
+            eval(expression).unwrap()
+        );
     }
 
     #[test]
@@ -75,5 +82,16 @@ mod test {
         let command = String::from("       ");
         let expression = read(command);
         assert_eq!(ReadError::NoCommand, expression.unwrap_err());
+    }
+
+    #[test]
+    fn command_not_found_returns_first_segment() {
+        let command = String::from("correct --false");
+        let expression = Expression::from(command.clone());
+
+        assert_eq!(
+            format!("{}: command not found", "correct"),
+            eval(expression).unwrap()
+        )
     }
 }
