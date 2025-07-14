@@ -1,38 +1,44 @@
-use std::process;
+mod builtin_exit {
+    use super::Expression;
+    use std::process;
 
-type ExitCode = i32;
-struct BuiltinExit {
-    code: ExitCode,
-}
-
-impl BuiltinExit {
-    fn from(expression: Expression) -> Self {
-        let code = expression
-            .arguments
-            .first()
-            .and_then(|arg| arg.parse::<ExitCode>().ok())
-            .unwrap_or(0);
-
-        Self { code }
+    type ExitCode = i32;
+    pub struct BuiltinExit {
+        code: ExitCode,
     }
 
-    fn run(&self) {
-        process::exit(self.code);
+    impl BuiltinExit {
+        pub fn from(expression: Expression) -> Self {
+            let code = expression
+                .arguments
+                .first()
+                .and_then(|arg| arg.parse::<ExitCode>().ok())
+                .unwrap_or(0);
+
+            Self { code }
+        }
+
+        pub fn run(&self) {
+            process::exit(self.code);
+        }
     }
 }
 
-struct BuiltinEcho {
-    text: String,
-}
-
-impl BuiltinEcho {
-    fn from(expression: Expression) -> Self {
-        let text = expression.arguments.join(" ");
-        Self { text }
+mod builtin_echo {
+    use super::Expression;
+    pub struct BuiltinEcho {
+        text: String,
     }
 
-    fn run(&self) -> String {
-        format!("{}", self.text)
+    impl BuiltinEcho {
+        pub fn from(expression: Expression) -> Self {
+            let text = expression.arguments.join(" ");
+            Self { text }
+        }
+
+        pub fn run(&self) -> String {
+            format!("{}", self.text)
+        }
     }
 }
 
@@ -70,10 +76,10 @@ pub fn eval(expression: Expression) -> Option<String> {
     let command = expression.command.clone();
     match expression.command.as_str() {
         "exit" => {
-            BuiltinExit::from(expression).run();
+            builtin_exit::BuiltinExit::from(expression).run();
             None
         }
-        "echo" => Some(BuiltinEcho::from(expression).run()),
+        "echo" => Some(builtin_echo::BuiltinEcho::from(expression).run()),
         _ => Some(format!("{command}: command not found")),
     }
 }
