@@ -120,7 +120,7 @@ impl Expression {
 
 mod builtins {
     pub fn get_builtins() -> Vec<&'static str> {
-        vec!["echo", "exit"]
+        vec!["echo", "exit", "type"]
     }
     use super::builtin_echo;
     use super::builtin_exit;
