@@ -21,6 +21,21 @@ impl BuiltinExit {
     }
 }
 
+struct BuiltinEcho {
+    text: String,
+}
+
+impl BuiltinEcho {
+    fn from(expression: Expression) -> Self {
+        let text = expression.arguments.join(" ");
+        Self { text }
+    }
+
+    fn run(&self) -> String {
+        format!("{}", self.text)
+    }
+}
+
 #[derive(Debug)]
 pub struct Expression {
     input: String,
@@ -58,11 +73,14 @@ pub fn read(input: String) -> Result<Expression, ReadError> {
 
 pub fn eval(expression: Expression) -> Option<String> {
     let command = expression.command.clone();
-    if expression.command == "exit" {
-        BuiltinExit::from(expression).run();
-        return None;
+    match expression.command.as_str() {
+        "exit" => {
+            BuiltinExit::from(expression).run();
+            return None;
+        }
+        "echo" => Some(BuiltinEcho::from(expression).run()),
+        _ => Some(format!("{}: command not found", command)),
     }
-    Some(format!("{}: command not found", command))
 }
 
 pub fn print(output: String) {
