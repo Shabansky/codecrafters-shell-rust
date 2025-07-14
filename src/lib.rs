@@ -38,7 +38,6 @@ impl BuiltinEcho {
 
 #[derive(Debug)]
 pub struct Expression {
-    input: String,
     command: String,
     arguments: Vec<String>,
 }
@@ -49,11 +48,7 @@ impl Expression {
         let command = parts.next().unwrap_or("").to_string();
         let arguments: Vec<String> = parts.map(|s| s.to_string()).collect();
 
-        Self {
-            input,
-            command,
-            arguments,
-        }
+        Self { command, arguments }
     }
 }
 
