@@ -59,7 +59,7 @@ pub enum ReadError {
 
 pub fn read(input: String) -> Result<Expression, ReadError> {
     let input = input.trim();
-    if input.len() == 0 {
+    if input.is_empty() {
         return Err(ReadError::NoCommand);
     }
 
@@ -71,15 +71,15 @@ pub fn eval(expression: Expression) -> Option<String> {
     match expression.command.as_str() {
         "exit" => {
             BuiltinExit::from(expression).run();
-            return None;
+            None
         }
         "echo" => Some(BuiltinEcho::from(expression).run()),
-        _ => Some(format!("{}: command not found", command)),
+        _ => Some(format!("{command}: command not found")),
     }
 }
 
 pub fn print(output: String) {
-    println!("{}", output);
+    println!("{output}");
 }
 
 #[cfg(test)]
