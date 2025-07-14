@@ -43,6 +43,7 @@ mod builtin_echo {
 }
 
 mod builtin_type {
+    use super::builtins::get_builtins;
     use super::Expression;
     pub struct BuiltinType {
         commands: Vec<String>,
@@ -58,7 +59,12 @@ mod builtin_type {
         pub fn run(self) -> String {
             let mut output = String::new();
             for command in self.commands {
-                output.push_str(format!("{command} is a shell builtin\n").as_str());
+                let is_builtin = get_builtins().contains(&command.as_str());
+                if is_builtin {
+                    output.push_str(format!("{command} is a shell builtin\n").as_str());
+                } else {
+                    output.push_str(format!("{command}: not found\n").as_str())
+                }
             }
 
             output
@@ -79,17 +85,17 @@ mod builtin_type {
 
         #[test]
         fn type_returns_single_line_for_single_command() {
-            let output = run_command_on_input(String::from("type test"));
+            let output = run_command_on_input(String::from("type exit"));
 
-            assert_eq!("test is a shell builtin", output);
+            assert_eq!("exit is a shell builtin", output);
         }
 
         #[test]
         fn type_returns_multiple_lines_for_multiple_commands() {
-            let output = run_command_on_input(String::from("type test me please"));
+            let output = run_command_on_input(String::from("type exit me please"));
             println!("OUTPUT: {output}");
             assert_eq!(
-                "test is a shell builtin\nme is a shell builtin\nplease is a shell builtin",
+                "exit is a shell builtin\nme: not found\nplease: not found",
                 output
             );
         }
@@ -110,6 +116,15 @@ impl Expression {
 
         Self { command, arguments }
     }
+}
+
+mod builtins {
+    pub fn get_builtins() -> Vec<&'static str> {
+        vec!["echo", "exit"]
+    }
+    use super::builtin_echo;
+    use super::builtin_exit;
+    use super::builtin_type;
 }
 
 #[derive(PartialEq, Debug)]
