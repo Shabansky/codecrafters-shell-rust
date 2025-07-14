@@ -32,7 +32,7 @@ impl BuiltinEcho {
     }
 
     fn run(&self) -> String {
-        format!("{}\n", self.text)
+        format!("{}", self.text)
     }
 }
 
